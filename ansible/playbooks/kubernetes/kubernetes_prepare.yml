@@ -1,0 +1,49 @@
+---
+
+- name: Prepare kubernetes nodes
+  hosts: cluster
+  gather_facts: no
+  become: yes
+  tags:
+    - k8s_prepare
+
+  tasks:
+
+    - name: Install Docker
+      ansible.builtin.apt:
+        name: docker.io
+        update_cache: yes
+
+    - name: Prepare Docker configuration
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/../../templates/daemon.json.j2"
+        dest: /etc/docker/daemon.json
+        mode: "0664"
+      notify: Restart docker
+
+    - name: Add kubernetes repository signing key
+      ansible.builtin.apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+
+    - name: Add kubernetes repository
+      ansible.builtin.apt_repository:
+        repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+
+    - name: Install kubernetes software
+      vars:
+        packages:
+          - kubelet
+          - kubeadm
+          - kubectl
+      ansible.builtin.apt:
+        name: "{{ packages }}"
+
+  handlers:
+
+    - name: Restart docker
+      ansible.builtin.systemd:
+        name: docker
+        state: restarted
+        enabled: yes

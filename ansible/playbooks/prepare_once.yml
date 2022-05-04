@@ -1,0 +1,7 @@
+---
+
+- name: Ansible prepare localhost
+  hosts: localhost
+  gather_facts: no
+
+- import_playbook: localhost/localhost.yml

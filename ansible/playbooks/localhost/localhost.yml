@@ -1,0 +1,8 @@
+---
+
+- name: Setup localhost configuration
+  hosts: localhost
+  gather_facts: no
+
+- import_playbook: localhost_system.yml
+- import_playbook: localhost_cloudinit.yml

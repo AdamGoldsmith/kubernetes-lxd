@@ -1,0 +1,26 @@
+---
+
+- name: Prepare kubernetes service
+  hosts: master
+  gather_facts: no
+  become: yes
+  tags:
+    - k8s_service
+
+  tasks:
+
+    - name: Create nginx service
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/../../templates/nginx.conf.j2"
+        dest: /etc/kubernetes/nginx.service
+        mode: "0664"
+
+    - name: Start nginx service
+      ansible.builtin.command:
+        cmd: kubectl --kubeconfig /etc/kubernetes/admin.conf
+          apply -f /etc/kubernetes/nginx.service
+      register: nginx
+
+    - name: Debug nginx
+      debug:
+        var: nginx

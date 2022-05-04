@@ -1,0 +1,64 @@
+---
+
+- name: Setup kubernetes master
+  hosts: master
+  gather_facts: no
+  become: yes
+  tags:
+    - k8s_master
+
+  tasks:
+
+    - name: Pull kubernetes images
+      ansible.builtin.command:
+        cmd: kubeadm config images pull
+      changed_when: no
+
+    - name: Prevent swap failures
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+        line: 'Environment="KUBELET_EXTRA_ARGS=--fail-swap-on=false"'
+        mode: "0640"
+
+    - name: Reread systemd configs
+      ansible.builtin.systemd:
+        daemon_reload: yes
+
+    - name: Check cluster status
+      ansible.builtin.command:
+        cmd: kubectl --kubeconfig /etc/kubernetes/admin.conf
+          cluster-info
+      changed_when: no
+      failed_when: no
+      register: cluster_info
+
+    - name: Debug cluster info
+      ansible.builtin.debug:
+        var: cluster_info
+        verbosity: "{{ verbosity_level | default(1) }}"
+
+    - name: Bootstrap kubernetes control plane
+      ansible.builtin.command:
+        cmd: kubeadm init
+          --pod-network-cidr=10.244.0.0/16
+          --ignore-preflight-errors=SystemVerification,Swap
+          --apiserver-cert-extra-sans=127.0.0.1
+      register: init_control_plane
+      when: cluster_info['rc']
+
+    - name: Debug control plane initialisation
+      ansible.builtin.debug:
+        var: init_control_plane
+        verbosity: "{{ verbosity_level | default(1) }}"
+
+    - name: Install flannel
+      ansible.builtin.command:
+        cmd: kubectl --kubeconfig /etc/kubernetes/admin.conf
+          apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+      changed_when: "'created' in flannel['stdout']"
+      register: flannel
+
+    - name: Debug flannel
+      ansible.builtin.debug:
+        var: flannel
+        verbosity: "{{ verbosity_level | default(1) }}"

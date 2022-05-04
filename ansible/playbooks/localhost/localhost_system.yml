@@ -1,0 +1,26 @@
+---
+
+- name: Prepare system configuration
+  hosts: localhost
+  gather_facts: no
+  become: yes
+
+  tasks:
+
+    - name: Update system settings
+      ansible.posix.sysctl:
+        name: "{{ item['key'] }}"
+        value: "{{ item['value'] }}"
+      loop: "{{ system_settings | dict2items }}"
+      become: yes
+
+    - name: Create ssh key pair directory
+      ansible.builtin.file:
+        path: "{{ vm_ssh_key_path | dirname }}"
+        state: directory
+
+    - name: Create ansible ssh key pair
+      community.crypto.openssh_keypair:
+        path: "{{ vm_ssh_key_path }}"
+        type: "{{ vm_ssh_key_type }}"
+        comment: "{{ vm_ssh_comment }}"

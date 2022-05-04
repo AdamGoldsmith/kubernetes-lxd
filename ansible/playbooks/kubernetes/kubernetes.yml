@@ -1,0 +1,11 @@
+---
+
+- name: Setup kubernetes cluster
+  hosts: localhost
+  gather_facts: no
+
+# - import_playbook: kubernetes_config.yml
+- import_playbook: kubernetes_prepare.yml
+- import_playbook: kubernetes_master.yml
+- import_playbook: kubernetes_worker.yml
+- import_playbook: kubernetes_service.yml

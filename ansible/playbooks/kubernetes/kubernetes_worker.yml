@@ -1,0 +1,40 @@
+---
+
+- name: Join kubernetes workers
+  hosts: worker
+  gather_facts: no
+  become: yes
+  tags:
+    - k8s_worker
+
+  tasks:
+
+    - name: Create join token
+      ansible.builtin.command:
+        cmd: kubeadm token create --print-join-command
+      delegate_to: "{{ groups['master'][0] }}"
+      run_once: yes
+      register: join_command
+
+    - name: Debug join command
+      ansible.builtin.debug:
+        var: join_command
+
+    - name: Join master kubernetes node
+      ansible.builtin.debug:
+        msg: "{{ join_command['stdout'] }}
+          --ignore-preflight-errors=SystemVerification,Swap"
+
+    - name: Join master kubernetes node
+      ansible.builtin.command:
+        cmd: "{{ join_command['stdout'] }}
+          --ignore-preflight-errors=SystemVerification,Swap"
+        creates: /etc/kubernetes/kubelet.conf
+
+  handlers:
+
+    - name: Restart docker
+      ansible.builtin.systemd:
+        name: docker
+        state: restarted
+        enabled: yes

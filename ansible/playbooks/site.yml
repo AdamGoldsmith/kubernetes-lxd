@@ -1,0 +1,7 @@
+---
+
+- name: Ansible entrypoint playbooks
+  hosts: localhost
+  gather_facts: no
+
+- import_playbook: kubernetes/kubernetes.yml

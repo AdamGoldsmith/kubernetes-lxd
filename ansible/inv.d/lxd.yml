@@ -1,0 +1,13 @@
+---
+plugin: community.general.lxd
+url: unix:/var/snap/lxd/common/lxd/unix.socket
+state: RUNNING
+type_filter: both
+
+groupby:
+  master:
+    type: pattern
+    attribute: kubernetes-master*
+  worker:
+    type: pattern
+    attribute: kubernetes-worker*
