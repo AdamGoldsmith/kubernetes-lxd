@@ -1,0 +1,23 @@
+---
+
+- name: Prepare system storage
+  hosts: localhost
+  gather_facts: no
+  become: yes
+  tags:
+    - never
+    - lvm
+
+  tasks:
+
+    - name: Extend root ubuntu logical volume to consume all remaining space in the volume group
+      community.general.lvol:
+        vg: ubuntu-vg
+        lv: ubuntu-lv
+        size: +100%FREE
+
+    - name: Resize root filesystem
+      filesystem:
+        dev: /dev/ubuntu-vg/ubuntu-lv
+        fstype: "ext4"
+        resizefs: yes

@@ -8,7 +8,7 @@ All commands were run inside a VMware Ubuntu 22.04 Desktop Virtual Machine.
 
 These are the versions of software used at time of testing
 
-* lxd 5.1 (Installed using snap - if you install this from source you will have to update the `socket` reference in `inv.d/lxd.yml` dynamic inventory to point to `unix:/var/lib/lxd/unix.socket`)
+* LXD 5.1 (Installed using snap - if you install this from source you will have to update the `socket` reference in `inv.d/lxd.yml` dynamic inventory to point to `unix:/var/lib/lxd/unix.socket`)
 * Ansible core 2.12.5
   * community.crypto.openssh_keypair plugin (install with `ansible-galaxy collection install community.crypto`)
   * community.general.lxd (install with `ansible-galaxy collection install community.general`)
@@ -16,6 +16,8 @@ These are the versions of software used at time of testing
 * Terraform 1.1.9
 
 ## Running the code (TL;DR)
+
+***Note***: _Don't forget to run_ `lxd init` _on the host first if it is a brand new instance!_
 
 1. Clone repo
 1. `cd ansible`

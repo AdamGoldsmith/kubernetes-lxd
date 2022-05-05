@@ -4,6 +4,9 @@
   hosts: localhost
   gather_facts: yes
   become: yes
+  tags:
+    - never
+    - install
 
   tasks:
 
