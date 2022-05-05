@@ -36,6 +36,16 @@ These are the versions of software used at time of testing
 
 1. Update README :-)
 
+## Known issues
+
+1. Couldn't initialise cluster (ZFS & overlay)
+
+    * https://scvalex.net/posts/49/
+
+    * Re-initialised LXD to use `dir` as storage pool backend driver (zfs doesn't play nicely with overlay).
+
+    * Now created a dedicated `btrfs` storage pool via terraform to address this
+
 ## References
 
 I used these blogs as a basis for this repo:

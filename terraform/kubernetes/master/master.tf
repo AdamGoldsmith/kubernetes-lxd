@@ -82,6 +82,23 @@ EOF
   }
 }
 
+# Create storage pool
+resource "lxd_storage_pool" "kubernetes" {
+  name   = "kubernetes"
+  driver = "btrfs"
+  config = {
+    source = "/var/snap/lxd/common/lxd/disks/kubernetes.img"
+    size   = "20GB"
+  }
+}
+
+# Create storage volumes
+resource "lxd_volume" "kubernetes" {
+  for_each = toset(local.instance_names.kubernetes-master)
+  name     = each.key
+  pool     = "${lxd_storage_pool.kubernetes.name}"
+}
+
 # Create kubernetes master containers
 resource "lxd_container" "kubernetes_masters" {
   for_each   = toset(local.instance_names.kubernetes-master)
@@ -89,4 +106,14 @@ resource "lxd_container" "kubernetes_masters" {
   image      = "ubuntu:22.04"
   ephemeral  = false
   profiles   = ["default", lxd_profile.master_config.name]
+
+  device {
+    name = "volume1"
+    type = "disk"
+    properties = {
+      path   = "/var/lib/docker"
+      source = "${lxd_volume.kubernetes[each.key].name}"
+      pool   = "${lxd_storage_pool.kubernetes.name}"
+    }
+  }
 }
