@@ -3,7 +3,6 @@
 - name: Prepare system configuration
   hosts: localhost
   gather_facts: no
-  become: yes
 
   tasks:
 
