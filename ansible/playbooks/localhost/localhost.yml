@@ -5,4 +5,6 @@
   gather_facts: no
 
 - import_playbook: localhost_system.yml
+- import_playbook: localhost_sshkeys.yml
+- import_playbook: localhost_install.yml
 - import_playbook: localhost_cloudinit.yml
