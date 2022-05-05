@@ -22,5 +22,10 @@
       register: nginx
 
     - name: Debug nginx
-      debug:
+      ansible.builtin.debug:
         var: nginx
+        verbosity: "{{ verbosity_level | default(1) }}"
+
+    - name: Test service availability on port 30090
+      wait_for:
+        port: 30090
