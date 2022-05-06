@@ -84,11 +84,10 @@ EOF
 
 # Create storage pool
 resource "lxd_storage_pool" "kubernetes" {
-  name   = "kubernetes"
-  driver = "btrfs"
+  name   = "kubernetes-master"
+  driver = "dir"
   config = {
-    source = "/var/snap/lxd/common/lxd/disks/kubernetes.img"
-    size   = "20GB"
+    source = "/var/snap/lxd/common/lxd/storage-pools/kubernetes-master"
   }
 }
 
